@@ -1,5 +1,6 @@
 import sqlite3
-import config
+import os
+from . import config
 
 
 class Database:
@@ -22,18 +23,24 @@ CREATE TABLE IF NOT EXISTS files (
         cursor.close()
 
     def upload_post(self, post: bytes, hash_val: str):
-        with open(f'{config.STORAGE_PATH}/{hash_val}', 'wb') as file_to_store:
-            file_to_store.write(post)
 
-        cursor = self.connection.cursor()
-        cursor.execute('INSERT INTO files (hash, file_path) VALUES (?, ?);', (hash_val, post))
+        if self.check_for_existence(hash_val):
+            return hash_val
+        else:
 
-        self.connection.commit()
-        cursor.close()
+            with open(os.path.join(config.STORAGE_PATH, hash_val), 'wb') as file_to_store:
+                file_to_store.write(post)
+
+            cursor = self.connection.cursor()
+            cursor.execute('INSERT INTO files (hash, file_path) VALUES (?, ?);',
+                           (hash_val, f'{config.STORAGE_PATH}/{hash_val}'))
+
+            self.connection.commit()
+            cursor.close()
+
+            return hash_val
 
     def check_for_existence(self, hash_val: str):
         cursor = self.connection.cursor()
-        cursor.execute('SELECT FROM files WHERE hash = ?', (hash_val, ))
-        result = cursor.fetchone()
-        print(result)
-        print(type(result))
+        cursor.execute('SELECT * FROM files WHERE hash = ?', (hash_val,))
+        return False if not cursor.fetchone() else True
