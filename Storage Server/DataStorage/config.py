@@ -1,0 +1,2 @@
+DATABASE_PATH: str = 'test.db'
+DATABASE_TIMEOUT: int = 30
