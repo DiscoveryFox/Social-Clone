@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS files (
         cursor.close()
 
     def upload_post(self, post: bytes, hash_val: str):
-
         if self.check_for_existence(hash_val):
             return hash_val
         else:
@@ -43,4 +42,26 @@ CREATE TABLE IF NOT EXISTS files (
     def check_for_existence(self, hash_val: str):
         cursor = self.connection.cursor()
         cursor.execute('SELECT * FROM files WHERE hash = ?', (hash_val,))
-        return False if not cursor.fetchone() else True
+        result = cursor.fetchone()
+        print(result)
+        cursor.close()
+        return False if not result else True
+
+    def delete_post(self, hash_val: str):
+        cursor = self.connection.cursor()
+        if self.check_for_existence(hash_val):
+            cursor.execute('SELECT file_path FROM files WHERE hash = ?', (hash_val, ))
+            file_path: str = cursor.fetchone()[0]
+            try:
+                os.remove(file_path)
+            except FileNotFoundError:
+                pass
+            except OSError:
+                return False
+            cursor.execute('DELETE FROM files WHERE hash = ?', (hash_val,))
+            self.connection.commit()
+            cursor.close()
+            return True
+        else:
+            return True
+
