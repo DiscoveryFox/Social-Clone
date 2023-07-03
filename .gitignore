@@ -2,6 +2,6 @@ python/
 .idea/
 Storage Server/DataController/config.py
 Storage Server/DataStorage/config.py
-storages/
+storage/
 *_test.py
 database_config_bucket_one.json
