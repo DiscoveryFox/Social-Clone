@@ -1,67 +1,115 @@
 import sqlite3
 import os
 from . import config
+import mysql.connector
+from mysql.connector import pooling
+import json
+
+
+def load_config(config_path: str):
+    with open(config_path) as config_file:
+        return json.load(config_file)
 
 
 class Database:
-    def __init__(self, database_path: str = config.DATABASE_PATH) -> None:
-        self.database_path: str = database_path
-        self.connection = sqlite3.connect(config.DATABASE_PATH, timeout=config.DATABASE_TIMEOUT)
+    def __init__(self, db_config: dict | str) -> None:
+        self.db_config: dict = db_config if type(db_config) is not str else load_config(db_config)
+        self.connection_pool: pooling.MySQLConnectionPool = pooling.MySQLConnectionPool(
+            **self.db_config
+        )
+
+    class Cursor:
+        def __init__(self, database) -> None:
+            self.database: Database = database
+            self.connection = self.database.connection_pool.get_connection()
+
+        def __enter__(self):
+            self.cursor = self.connection.cursor()
+            return self.cursor, self.connection
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self.cursor.close()
+            self.connection.close()
 
     def init_database(self) -> None:
         """
         Initializes the database.
         :return: None
         """
-        cursor = self.connection.cursor()
-        cursor.execute('''
-CREATE TABLE IF NOT EXISTS files (
-    hash TEXT PRIMARY KEY,
-    file_path TEXT UNIQUE 
+        with self.Cursor(self) as (cursor, connection):
+            cursor.execute('''
+    CREATE TABLE IF NOT EXISTS files (
+    hash VARCHAR(64) PRIMARY KEY,
+    file_path TEXT UNIQUE,
+    links INT DEFAULT 1
 );''')
-        self.connection.commit()
-        cursor.close()
+
+            connection.commit()
+
+    def check_for_existence(self, hash_val: str):
+        with self.Cursor(self) as (cursor, connection):
+            cursor.execute('SELECT * FROM files WHERE hash = %s', (hash_val,))
+            return False if not cursor.fetchone() else True
+
+    def increase_reference(self, hash_val: str):
+        print('incresing reference')
+        with self.Cursor(self) as (cursor, connection):
+            cursor.execute('UPDATE files SET links = links + 1 WHERE hash=%s',
+                           (hash_val,))
+            connection.commit()
+
+    def decrease_reference(self, hash_val: str):
+        with self.Cursor(self) as (cursor, connection):
+            cursor.execute('UPDATE files SET links = links - 1 WHERE hash = %s', (hash_val,))
+            connection.commit()
+            cursor.execute("SELECT links FROM files WHERE hash = %s", (hash_val,))
+            result = cursor.fetchone()
+            if result and result[0] == 0:
+                # Delete the column from the database if 'links' is zero
+                cursor.execute('SELECT file_path FROM files WHERE hash = %s', (hash_val,))
+                file_path: str = cursor.fetchone()[0]
+                try:
+                    os.remove(file_path)
+                except FileNotFoundError:
+                    pass
+                except OSError:
+                    return False
+                cursor.execute('DELETE FROM files WHERE hash = %s', (hash_val,))
+                connection.commit()
+                return 0
+            else:
+                return result[0]
 
     def upload_post(self, post: bytes, hash_val: str):
         if self.check_for_existence(hash_val):
+            self.increase_reference(hash_val)
             return hash_val
         else:
-
             with open(os.path.join(config.STORAGE_PATH, hash_val), 'wb') as file_to_store:
                 file_to_store.write(post)
-
-            cursor = self.connection.cursor()
-            cursor.execute('INSERT INTO files (hash, file_path) VALUES (?, ?);',
-                           (hash_val, f'{config.STORAGE_PATH}/{hash_val}'))
-
-            self.connection.commit()
-            cursor.close()
+            with self.Cursor(self) as (cursor, connection):
+                cursor.execute('INSERT INTO files (hash, file_path) VALUES (%s, %s);',
+                               (hash_val, f'{config.STORAGE_PATH}/{hash_val}'))
+                connection.commit()
 
             return hash_val
 
-    def check_for_existence(self, hash_val: str):
-        cursor = self.connection.cursor()
-        cursor.execute('SELECT * FROM files WHERE hash = ?', (hash_val,))
-        result = cursor.fetchone()
-        print(result)
-        cursor.close()
-        return False if not result else True
+    def _delete_post(self, hash_val: str):
+        with self.Cursor(self) as (cursor, connection):
+            if self.check_for_existence(hash_val):
+                cursor.execute('SELECT file_path FROM files WHERE hash = %s', (hash_val,))
+                file_path: str = cursor.fetchone()[0]
+                try:
+                    os.remove(file_path)
+                except FileNotFoundError:
+                    pass
+                except OSError:
+                    return False
+                cursor.execute('DELETE FROM files WHERE hash = %s', (hash_val,))
+                connection.commit()
+                return True
+            else:
+                return True
 
     def delete_post(self, hash_val: str):
-        cursor = self.connection.cursor()
-        if self.check_for_existence(hash_val):
-            cursor.execute('SELECT file_path FROM files WHERE hash = ?', (hash_val, ))
-            file_path: str = cursor.fetchone()[0]
-            try:
-                os.remove(file_path)
-            except FileNotFoundError:
-                pass
-            except OSError:
-                return False
-            cursor.execute('DELETE FROM files WHERE hash = ?', (hash_val,))
-            self.connection.commit()
-            cursor.close()
-            return True
-        else:
-            return True
-
+        self.decrease_reference(hash_val)

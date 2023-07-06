@@ -28,7 +28,7 @@ def remove_metadata(image_bytes) -> bytes | None:
                 del image.info[key]
 
         output_buffer = BytesIO()
-        image.save(output_buffer, format="JPEG", optimize=True, quality=90)
+        image.save(output_buffer, format="JPEG", optimize=True)
 
         modified_bytes = output_buffer.getvalue()
 
@@ -50,7 +50,8 @@ def remove_metadata(image_bytes) -> bytes | None:
 
 
 def main():
-    db = storage.Database()
+    db = storage.Database(db_config=r'C:\Users\Flinn\Documents\Social-Clone'
+                                    r'\database_config_bucket_one.json')
     db.init_database()
 
     while True:
@@ -64,12 +65,9 @@ def main():
                 f.seek(0)
                 print(calculate_hash(f.read()))
 
-                x = db.check_for_existence(sha256_hash.hexdigest())
-                print(x)
-                if not x:
-                    f.seek(0)
-                    y = db.upload_post(post=f.read(), hash_val=sha256_hash.hexdigest())
-                    print(y)
+                f.seek(0)
+                y = db.upload_post(post=f.read(), hash_val=sha256_hash.hexdigest())
+                print(y)
         else:
             hash_to_del = input('Enter hash value to delete: ')
             exists_to_del = db.check_for_existence(hash_to_del)
@@ -83,9 +81,12 @@ def main():
 
 if __name__ == '__main__':
     # Example usage
+    main()
+    r"""
     image_path = r"C:\Users\Flinn\Downloads\941-1080x900.jpg"
     output_path = r"C:\Users\Flinn\Downloads\941-1080x900_2.jpg"
     with open(image_path, 'rb') as file:
         x = remove_metadata(file.read())
         with open(output_path, 'wb') as save_file:
             save_file.write(x)
+    """
