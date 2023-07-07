@@ -1,1 +1,0 @@
-CREATE (:User {name: "user_name", id: "user_id"})-[:FOLLOWS]-> (:User {name: "user_name_2"})
