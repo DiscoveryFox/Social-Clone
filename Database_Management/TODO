@@ -1,7 +1,0 @@
-Need to create seperation between User, Database, Post 
-Check for Scalability of Model
-Discuss Relational Reqs, i.e) can a user who is blocked still follow the other user?, does a friend mean that they must follow, etc...
-
-Why have user ID? Can we remove this attribute ?
-
-Discuss how posts will be identified - by hash or by another type (hash only effects images, no?)
