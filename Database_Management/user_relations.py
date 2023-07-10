@@ -48,13 +48,17 @@ class Database:
                 name = str(i)[26:-2].lower()
                 testing_idea.append(name)
             if user.get_user_name().lower() not in testing_idea:
-                neo4j_create_statement = "CREATE (" + user.get_user_name() + ":User {user_name: '" + str(user.get_user_name()) +\
-                "' , user_id: " + str(user.get_user_id()) + "})"
+                neo4j_create_statement = "CREATE (" + user.get_user_name() + ":User {user_name: '" + str(user.get_user_name()) + "'})"
                 self.db.run(neo4j_create_statement)
                 created = True
             else:
                 print("Username not available: " + user.get_user_name())
                 break
+
+    def remove_user(self, user) -> None:
+        neo4j_create_statement = "MATCH (user:User {user_name: '" + str(user.get_user_name()) + "'})" + "DETACH DELETE user"
+
+        self.db.run(neo4j_create_statement)
     
     def check_status(self, user_name_1:str, user_name_2:str) -> str or None:
         """
@@ -186,23 +190,35 @@ class User:
         """Returns user_id"""
         return self.user_id
 
-class Post:
-    def __init__(self, user_name:str, hash_value:int, bytes:bytes) -> None:
-        self.user_name = user_name
-        self.hash_value = hash_value
-        self.bytes = bytes
+class Image_Post:
+    def __init__(self, id, hash, description, creator, upload_time) -> None:
+        pass
+
+class Text_Post:
+    def __init__(self, id, hash, description, creator, upload_time) -> None:
+        pass
+
+class Video_Post:
+    def __init__(self, id, hash, description, creator, upload_time) -> None:
+        pass
     
     #TODO - What can a Post do? Give data I guess?? 
 
 if __name__ == "__main__":
 
-    new_session = Database(uri="neo4j://localhost:8000", auth=('neo4j', 'password'))
+    new_session = Database(uri="bolt://192.168.0.207:7687", auth=('neo4j', 'adminadmin'))
     new_session.start()
 
     user_1 = User('a' , 1)
     user_2 = User('b' ,2)
     new_session.add_user(user_1)
     new_session.add_user(user_2)
-    new_session.friend_user('a', 'b')
+    new_session.block_user('a', 'b')
     print(new_session.check_status('a','b'))
+    new_session.friend_user('b', 'a')
+    print(new_session.check_status('a','b'))
+
+    new_session.remove_user(user_1)
+    print(new_session.check_status('a','b'))
+
     new_session.stop()
