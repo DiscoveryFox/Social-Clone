@@ -19,6 +19,8 @@ Relations between users:
   - Blocked - single way
   - Follows - single way
 
+For all posts I am currently taking a User class as input, I am doing the same for all relations even though only USERNAME is used, should I keep this method, or update to only use USERNAME? 
+
 ImagePost:
   - post_id CHECKED UUID
   - hash_value of image
@@ -29,7 +31,7 @@ ImagePost:
 
 TextPost:
   - post_id CHECKED UUID
-  - ID of the stored text in the database
+  - ID of the stored text in the database - How is this accomplished, hash?
   - creator USERNAME
   - uploaded_at TIMESTAMP
   - custom_tag but they need to choose from predefined tags
