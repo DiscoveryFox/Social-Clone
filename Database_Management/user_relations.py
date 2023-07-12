@@ -60,6 +60,27 @@ class Image_Post:
         self.tags = tags
         pass
 
+    def get_id(self):
+        return self.id
+
+    def get_hash(self):
+        return self.hash
+    
+    def get_description(self):
+        return self.description
+
+    def get_creator(self):
+        return self.creator
+
+    def get_creator_name(self):
+        return self.creator_user_name
+
+    def get_upload_time(self):
+        return self.upload_time
+        
+    def get_tags(self):
+        return self.tags
+
 class Text_Post:
     def __init__(self, id:uuid, hash:hash, description:str, creator:User, upload_time:time, tags:list) -> None:
         self.id = id
@@ -71,6 +92,27 @@ class Text_Post:
         self.tags = tags
         pass
 
+    def get_id(self):
+        return self.id
+
+    def get_hash(self):
+        return self.hash
+    
+    def get_description(self):
+        return self.description
+
+    def get_creator(self):
+        return self.creator
+
+    def get_creator_name(self):
+        return self.creator_user_name
+
+    def get_upload_time(self):
+        return self.upload_time
+        
+    def get_tags(self):
+        return self.tags
+        
 class Video_Post:
     def __init__(self, id:uuid, hash:hash, description:str, creator:User, upload_time:time, tags:list) -> None:
         self.id = id
@@ -81,6 +123,27 @@ class Video_Post:
         self.upload_time = upload_time
         self.tags = tags
         pass
+
+    def get_id(self):
+        return self.id
+
+    def get_hash(self):
+        return self.hash
+    
+    def get_description(self):
+        return self.description
+
+    def get_creator(self):
+        return self.creator
+
+    def get_creator_name(self):
+        return self.creator_user_name
+
+    def get_upload_time(self):
+        return self.upload_time
+        
+    def get_tags(self):
+        return self.tags
     
     #TODO - What can a Post do? Give data I guess?? 
 
@@ -120,7 +183,7 @@ class Database:
     def stop(self):
         self.db.close()
     
-    def add_user(self, user) -> None:
+    def add_user(self, user:User) -> None:
         #TODO: Improve Drastically, maybe create a new function as well?? 
         created = False 
         testing_idea = []
