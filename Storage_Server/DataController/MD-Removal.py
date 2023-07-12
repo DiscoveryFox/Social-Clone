@@ -11,7 +11,7 @@ class ImageObj:
             self.image.delete(i)
 
 
-paths = '/home/robbie-simmonds/Desktop/testing.jpg'
+paths = "/home/robbie-simmonds/Desktop/testing.jpg"
 test = ImageObj(path=paths)
 for f in sorted(test.image.list_all()):
     print(str(f) + " " + str(test.image.get(f)))

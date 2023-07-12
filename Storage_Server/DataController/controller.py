@@ -17,7 +17,7 @@ def main():
     db.init_database()
 
     while True:
-        filepath = input('Filepath: ')
+        filepath = input("Filepath: ")
         if filepath:
             with open(filepath, "rb") as f:
                 sha256_hash = hashlib.sha256()
@@ -34,15 +34,15 @@ def main():
                     y = db.upload_post(post=f.read(), hash_val=sha256_hash.hexdigest())
                     print(y)
         else:
-            hash_to_del = input('Enter hash value to delete: ')
+            hash_to_del = input("Enter hash value to delete: ")
             exists_to_del = db.check_for_existence(hash_to_del)
-            print('Exists: ', exists_to_del)
+            print("Exists: ", exists_to_del)
             if exists_to_del:
                 db.delete_post(hash_to_del)
 
                 exists_to_del = db.check_for_existence(hash_to_del)
-                print('Exists: ', exists_to_del)
+                print("Exists: ", exists_to_del)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

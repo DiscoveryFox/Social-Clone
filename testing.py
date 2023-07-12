@@ -34,11 +34,13 @@ def remove_metadata(image_bytes) -> bytes | None:
 
         size_difference = len(image_bytes) - len(modified_bytes)
         if size_difference < 0:
-            warnings.warn('File got larger through removal of metadata.\n'
-                          f'\tBefore: {calculate_hash(image_bytes)} \t| {len(image_bytes)} '
-                          f'bytes\n\t'
-                          f'After: {calculate_hash(modified_bytes)} \t| {len(modified_bytes)} '
-                          f'bytes\n\tSize difference: {size_difference} bytes')
+            warnings.warn(
+                "File got larger through removal of metadata.\n"
+                f"\tBefore: {calculate_hash(image_bytes)} \t| {len(image_bytes)} "
+                f"bytes\n\t"
+                f"After: {calculate_hash(modified_bytes)} \t| {len(modified_bytes)} "
+                f"bytes\n\tSize difference: {size_difference} bytes"
+            )
 
         print("Metadata removed successfully.")
         print("Size difference: {} bytes".format(size_difference))
@@ -50,12 +52,14 @@ def remove_metadata(image_bytes) -> bytes | None:
 
 
 def main():
-    db = storage.Database(db_config=r'C:\Users\Flinn\Documents\Social-Clone'
-                                    r'\database_config_bucket_one.json')
+    db = storage.Database(
+        db_config=r"C:\Users\Flinn\Documents\Social-Clone"
+        r"\database_config_bucket_one.json"
+    )
     db.init_database()
 
     while True:
-        filepath = input('Filepath: ')
+        filepath = input("Filepath: ")
         if filepath:
             with open(filepath, "rb") as f:
                 sha256_hash = hashlib.sha256()
@@ -69,17 +73,17 @@ def main():
                 y = db.upload_post(post=f.read(), hash_val=sha256_hash.hexdigest())
                 print(y)
         else:
-            hash_to_del = input('Enter hash value to delete: ')
+            hash_to_del = input("Enter hash value to delete: ")
             exists_to_del = db.check_for_existence(hash_to_del)
-            print('Exists: ', exists_to_del)
+            print("Exists: ", exists_to_del)
             if exists_to_del:
                 db.delete_post(hash_to_del)
 
                 exists_to_del = db.check_for_existence(hash_to_del)
-                print('Exists: ', exists_to_del)
+                print("Exists: ", exists_to_del)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Example usage
     main()
     r"""
