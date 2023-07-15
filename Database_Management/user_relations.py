@@ -179,7 +179,6 @@ class Video_Post:
 
     # TODO - What can a Post do? Give data I guess??
 
-
 # NOTE - for all statuses, variable 'r' or 'R' must be used for relations, only 1 char.
 class Database:
     """Creates a New Session and sets up Restricted Statements"""
@@ -460,16 +459,6 @@ class Database:
         self.db.run(neo4j_create_statement)
 
 
-if __name__ == "__main__":
-    # new_session = Database(uri="bolt://192.168.0.207:7687", auth=('neo4j', 'adminadmin'))
-    new_session = Database(uri="neo4j://127.0.0.1:8000", auth=("neo4j", "password"))
-    new_session.start()
-
-    user_1 = User("a", "bob.email", "hellow worlds", time.time(), time.time(), False)
-    user_2 = User("b", "frank.email", "hdsllow worlds", time.time(), time.time(), False)
-
-    new_session.add_user(user_1)
-    new_session.add_user(user_2)
-    new_session.friend_user(user_1, user_2)
-
+if __name__ == '__main__':
+    new_session = Database(uri='neo4j://192.168.0.207:8000', auth=('neo4j', 'password'))
     new_session.stop()
