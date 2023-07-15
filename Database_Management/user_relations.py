@@ -62,7 +62,7 @@ class Image_Post:
     def __init__(
         self,
         id: uuid,
-        hash: hash,
+        hash: hash, # noqa
         description: str,
         creator: User,
         upload_time: time,
