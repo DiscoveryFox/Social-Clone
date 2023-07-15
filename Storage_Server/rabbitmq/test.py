@@ -8,11 +8,11 @@ def process_message(ch, method, properties, body):
 
 def consume_messages(worker_id):
     # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
     channel = connection.channel()
 
     # Declare the queue for this worker
-    queue_name = 'worker_queue' + worker_id
+    queue_name = "worker_queue" + worker_id
     channel.queue_declare(queue=queue_name)
 
     # Set the prefetch count to limit the number of unacknowledged messages per worker
