@@ -1,4 +1,6 @@
-mysql-connector==2.2.9
-neo4j==5.10.0
-Pillow==9.5.0
-pytz==2023.3
+mysql-connector-python
+neo4j
+Pillow
+pytz
+pika
+flask

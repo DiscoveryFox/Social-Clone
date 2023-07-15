@@ -75,7 +75,6 @@ class Image_Post:
         self.creator_user_name = creator.get_user_name()
         self.upload_time = upload_time
         self.tags = tags
-        pass
 
     def get_id(self):
         return self.id
@@ -116,7 +115,6 @@ class Text_Post:
         self.creator_user_name = creator.get_user_name()
         self.upload_time = upload_time
         self.tags = tags
-        pass
 
     def get_id(self):
         return self.id
@@ -157,7 +155,6 @@ class Video_Post:
         self.creator_user_name = creator.get_user_name()
         self.upload_time = upload_time
         self.tags = tags
-        pass
 
     def get_id(self):
         return self.id
@@ -198,11 +195,8 @@ class Database:
         self.driver = GraphDatabase.driver(uri=self.uri, auth=self.auth)
         self.db = self.driver.session()
 
-    def start(self) -> GraphDatabase:
+    def start(self):
         """ """
-
-        DATABASE = self.driver.session()
-
         neo4j_create_statement_1 = (
             "CREATE CONSTRAINT FOR (user:User) REQUIRE user.user_name IS UNIQUE"
         )
@@ -220,6 +214,9 @@ class Database:
 
     def stop(self):
         self.db.close()
+
+    def create_image_post(self):
+        ...
 
     def add_user(self, user: User) -> None:
         # TODO: Improve Drastically, maybe create a new function as well??

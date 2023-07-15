@@ -4,7 +4,7 @@ services:
     image: neo4j:5.9.0-community
     ports:
       - 7000:7474
-      - 8000:7687
+      - 8081:7687
     restart: unless-stopped
     environment:
       - NEO4J_AUTH=neo4j/password

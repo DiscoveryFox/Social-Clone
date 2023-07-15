@@ -4,6 +4,7 @@ from . import config
 import mysql.connector
 from mysql.connector import pooling
 import json
+import hashlib
 
 
 def load_config(config_path: str):
@@ -51,6 +52,11 @@ class Database:
             connection.commit()
 
     def check_for_existence(self, hash_val: str):
+        """
+
+        :param hash_val:
+        :return:
+        """
         with self.Cursor(self) as (cursor, connection):
             cursor.execute("SELECT * FROM files WHERE hash = %s", (hash_val,))
             return False if not cursor.fetchone() else True
@@ -125,6 +131,17 @@ class Database:
                 return True
             else:
                 return True
+
+    @staticmethod
+    def calculate_hash(data: bytes, chunk_size: int = 4096):
+        _hash = hashlib.sha256()
+        while True:
+            byte_block = data[:chunk_size]
+            if not byte_block:
+                break
+            _hash.update(byte_block)
+            data = data[chunk_size:]
+        return _hash.hexdigest()
 
     def delete_post(self, hash_val: str):
         self.decrease_reference(hash_val)
