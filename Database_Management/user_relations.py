@@ -173,9 +173,6 @@ class Database:
         self.auth = auth
         self.driver = GraphDatabase.driver(uri=self.uri, auth=self.auth)
         self.db = self.driver.session()
-
-    def start(self):
-        """ """
         neo4j_create_statement_1 = (
             "CREATE CONSTRAINT FOR (user:User) REQUIRE user.username IS UNIQUE"
         )
