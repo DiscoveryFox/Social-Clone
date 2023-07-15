@@ -460,3 +460,8 @@ class Database:
         )
 
         self.db.run(neo4j_create_statement)
+
+
+if __name__ == '__main__':
+    new_session = Database(uri='neo4j://192.168.0.207:8000', auth=('neo4j', 'password'))
+    new_session.stop()
