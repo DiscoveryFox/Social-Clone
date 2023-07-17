@@ -4,4 +4,5 @@ Storage Server/DataController/config.py
 Storage Server/DataStorage/config.py
 storage/
 *_test.py
+*.pyc
 database_config_bucket_one.json
